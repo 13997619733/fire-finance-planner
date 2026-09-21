@@ -11,6 +11,12 @@
   --shadow:0 10px 30px rgba(29,45,74,.08)
 }
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,.tx-item,.asset-item,.perf-item,.nav-item,.nav-plus,.text-btn,.round-btn{
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+button{user-select:none;-webkit-user-select:none}
+:focus-visible{outline:3px solid rgba(51,120,230,.22);outline-offset:2px}
 html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#dfe5ee;color:var(--text)}
 body{display:flex;justify-content:center}
 button,input,select{font:inherit} button{cursor:pointer}
@@ -21,16 +27,19 @@ button,input,select{font:inherit} button{cursor:pointer}
     radial-gradient(circle at 13% 0%,rgba(205,221,255,.66),transparent 30%),
     linear-gradient(180deg,#eff6ff 0%,#f8f9fc 34%,#f3f5fa 100%);
 }
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:52px}
 .brand{font-size:27px;font-weight:850}
 .top-actions{display:flex;gap:8px}
-.round-btn{width:48px;height:48px;border:0;border-radius:50%;background:rgba(255,255,255,.86);box-shadow:var(--shadow);font-size:20px}
-.page{display:none}.page.active{display:block}
-.card{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.82);border-radius:24px;box-shadow:var(--shadow);padding:20px;margin-bottom:15px}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.round-btn{width:48px;height:48px;border:0;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:var(--shadow);font-size:20px;transition:transform .14s ease,background .14s ease,box-shadow .14s ease}
+.round-btn:active{transform:scale(.92);background:#f1f5fb;box-shadow:0 4px 14px rgba(29,45,74,.10)}
+.page{display:none}.page.active{display:block;animation:pageIn .18s ease-out}
+@keyframes pageIn{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:none}}
+.card{background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.9);border-radius:24px;box-shadow:var(--shadow);padding:20px;margin-bottom:15px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card-head>div{min-width:0}
 .card-title{font-size:18px;font-weight:830}
 .card-note{font-size:11px;color:#9aa1aa;margin-top:4px;line-height:1.45}
-.text-btn{border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:750;padding:5px}
+.text-btn{border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:780;padding:7px 8px;min-height:36px;white-space:nowrap;flex:0 0 auto;border-radius:10px;transition:transform .12s ease,background .12s ease}
+.text-btn:active{transform:scale(.94);background:#edf4ff}
 .section-title{font-size:13px;font-weight:800;color:#646b75;margin:18px 0 9px}
 .empty{padding:22px;text-align:center;color:#9aa1aa;font-size:13px}
 
@@ -48,14 +57,18 @@ button,input,select{font:inherit} button{cursor:pointer}
 .month-title{font-size:19px;font-weight:850}
 .tx-list{display:flex;flex-direction:column}
 .tx-item{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.tx-item:last-child{border-bottom:0}.tx-item,.asset-item{cursor:pointer}
+.tx-item:last-child{border-bottom:0}.tx-item,.asset-item{cursor:pointer;border-radius:13px;transition:transform .12s ease,background .12s ease}
+.tx-item:active,.asset-item:active,.perf-item:active{transform:scale(.985);background:#f3f7fc}
 .tx-icon{width:42px;height:42px;border-radius:14px;background:#f3f6fa;display:grid;place-items:center;font-size:19px}
 .tx-main{min-width:0}.tx-name{font-size:14px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx-meta{font-size:10px;color:#9aa1aa;margin-top:3px}
 .tx-amt{font-size:14px;font-weight:820;text-align:right}.tx-amt.income{color:var(--green)}
 .action-row{display:flex;gap:8px}
-.primary-btn,.secondary-btn,.danger-btn{border:0;border-radius:12px;padding:10px 13px;font-size:13px;font-weight:760}
-.primary-btn{background:var(--blue);color:white}.secondary-btn{background:#eef3f9;color:#59616c}.danger-btn{background:#fff0f0;color:#c64f4f}
+.primary-btn,.secondary-btn,.danger-btn{border:0;border-radius:13px;padding:11px 14px;min-height:44px;font-size:13px;font-weight:780;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
+.primary-btn{background:var(--blue);color:white;box-shadow:0 5px 14px rgba(51,120,230,.18)}
+.secondary-btn{background:#eef3f9;color:#59616c}
+.danger-btn{background:#fff0f0;color:#c64f4f}
+.primary-btn:active,.secondary-btn:active,.danger-btn:active{transform:scale(.97);filter:brightness(.97)}
 
 /* assets */
 .asset-list{display:flex;flex-direction:column}
@@ -81,7 +94,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .perf-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .perf-kpi{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
 .perf-list{margin-top:12px}
-.perf-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.perf-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 8px;margin:0 -8px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:13px;transition:transform .12s ease,background .12s ease}
 .perf-item:last-child{border-bottom:0}
 .perf-year{font-size:14px;font-weight:850}
 .perf-main{min-width:0}
@@ -137,7 +150,8 @@ button,input,select{font:inherit} button{cursor:pointer}
 .range{margin-top:12px}
 input[type=range]{width:100%;height:28px;-webkit-appearance:none;appearance:none;background:transparent}
 input[type=range]::-webkit-slider-runnable-track{height:3px;background:repeating-linear-gradient(90deg,#d7dee8 0,#d7dee8 2px,transparent 2px,transparent 10px)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;height:25px;border-radius:50%;background:var(--blue);border:3px solid white;box-shadow:0 2px 8px rgba(51,120,230,.34);margin-top:-11px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;height:25px;border-radius:50%;background:var(--blue);border:3px solid white;box-shadow:0 2px 8px rgba(51,120,230,.34);margin-top:-11px;transition:transform .1s ease,box-shadow .1s ease}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12);box-shadow:0 3px 12px rgba(51,120,230,.42)}
 .range-foot{display:flex;justify-content:space-between;font-size:10px;color:#9ca2ab}
 .target-box{background:#f8fbff;border:1px solid #e4ebf4;border-radius:18px;padding:14px}
 .target-label{font-size:12px;color:#747b85}.target-edit{display:flex;align-items:baseline;margin-top:5px}.target-edit span{font-size:23px;font-weight:850}.target-edit input{width:100%;border:0;outline:0;background:transparent;font-size:33px;font-weight:880}
@@ -160,6 +174,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
   z-index:50;overscroll-behavior:contain
 }
 .modal-backdrop.show{display:flex}
+.modal-backdrop.show .modal{animation:sheetIn .2s cubic-bezier(.2,.75,.3,1)}
+@keyframes sheetIn{from{opacity:.7;transform:translateY(24px) scale(.985)}to{opacity:1;transform:none}}
 .modal{
   width:min(100%,430px);
   max-height:calc(var(--vv-height,100dvh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
@@ -167,13 +183,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
   background:white;border-radius:25px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.2)
 }
 .modal-head{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:850;margin-bottom:14px;position:sticky;top:-20px;background:white;z-index:2;padding-top:2px}
-.close{border:0;width:34px;height:34px;border-radius:50%;background:#f0f3f7;font-size:18px;flex:0 0 auto}
+.close{border:0;width:38px;height:38px;border-radius:50%;background:#f0f3f7;font-size:18px;flex:0 0 auto;transition:transform .12s ease,background .12s ease}
+.close:active{transform:scale(.9);background:#e4e9ef}
 .modal-form{display:flex;flex-direction:column;gap:10px}
 .field label{display:block;font-size:11px;color:#7d848e;margin-bottom:5px}
 .field input,.field select{
   width:100%;border:1px solid #dfe5ec;border-radius:12px;padding:12px 11px;
-  font-size:16px;line-height:1.25;outline:0;background:white;scroll-margin-block:96px
+  font-size:16px;line-height:1.25;outline:0;background:white;scroll-margin-block:96px;
+  transition:border-color .14s ease,box-shadow .14s ease,background .14s ease
 }
+.field input:focus,.field select:focus{border-color:#8bb4f5;box-shadow:0 0 0 3px rgba(51,120,230,.09);background:#fbfdff}
 .check-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#606872}
 .modal-actions{display:flex;gap:8px;margin-top:14px;padding-bottom:max(2px,env(safe-area-inset-bottom))}
 .modal-actions button{flex:1}
@@ -217,6 +236,16 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
   box-shadow:0 0 0 3px rgba(51,120,230,.09);
 }
 
+
+.toast{
+  position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translate(-50%,16px);
+  max-width:min(82vw,330px);padding:10px 15px;border-radius:999px;background:rgba(25,30,38,.92);color:#fff;
+  font-size:12px;font-weight:720;box-shadow:0 8px 24px rgba(0,0,0,.16);opacity:0;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;z-index:80;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+body.keyboard-open .toast{bottom:18px}
+
 /* bottom nav */
 .bottom-nav{
   position:fixed;
@@ -236,7 +265,13 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
   -webkit-backdrop-filter:blur(22px);
   z-index:40
 }
-.nav-item{height:56px;border:0;background:transparent;border-radius:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:#1b1e23}.nav-item.active{background:#e8f2ff;color:var(--blue);font-weight:800}.nav-icon{font-size:22px;line-height:1}.nav-plus{width:50px;height:50px;border:0;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:32px;box-shadow:0 4px 16px rgba(20,30,50,.09);margin:auto}
+.nav-item{height:56px;border:0;background:transparent;border-radius:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:#59616c;transition:transform .14s ease,background .16s ease,color .16s ease}
+.nav-item:active{transform:scale(.92)}
+.nav-item.active{background:#e8f2ff;color:var(--blue);font-weight:820}
+.nav-icon{font-size:22px;line-height:1;transition:transform .16s ease}
+.nav-item.active .nav-icon{transform:translateY(-1px) scale(1.08)}
+.nav-plus{width:50px;height:50px;border:0;border-radius:50%;background:linear-gradient(180deg,#fff,#f6f9fd);display:grid;place-items:center;font-size:32px;color:var(--blue);box-shadow:0 5px 18px rgba(20,30,50,.13);margin:auto;transition:transform .14s ease,box-shadow .14s ease}
+.nav-plus:active{transform:scale(.9) rotate(8deg);box-shadow:0 3px 10px rgba(20,30,50,.10)}
 @media(max-width:360px){
   .app{padding-left:14px;padding-right:14px}
   .card{padding:18px}
@@ -286,7 +321,7 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
   <section class="card">
     <div class="card-head">
       <div><div class="card-title">我的资产</div><div class="card-note">区分现金、投资和其他资产；点击已有账户可编辑。只有勾选“计入 FIRE”的资产参与 FIRE 进度。</div></div>
-      <button class="text-btn" id="addAssetBtn">＋添加</button>
+      <button class="text-btn" id="addAssetBtn" aria-label="添加资产账户">＋添加</button>
     </div>
     <div class="summary-grid">
       <div class="summary-box"><div class="summary-label">总资产</div><div class="summary-value amount" id="assetTotal">--</div></div>
@@ -337,7 +372,7 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
         <div class="card-title">年度投资收益率</div>
         <div class="card-note">每年直接记录一个实际投资收益率，系统自动计算多年年化。</div>
       </div>
-      <button class="text-btn" id="addPerformanceBtn">＋记录</button>
+      <button class="text-btn" id="addPerformanceBtn" aria-label="记录年度收益率">＋记录</button>
     </div>
 
     <div class="perf-kpi">
@@ -491,6 +526,8 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
   </section>
 </section>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <nav class="bottom-nav">
   <button class="nav-item active" data-page="bills"><span class="nav-icon">▤</span><span>账单</span></button>
   <button class="nav-item" data-page="assets"><span class="nav-icon">▣</span><span>资产</span></button>
@@ -589,6 +626,23 @@ input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
 <script>
 (() => {
 const $=id=>document.getElementById(id);
+let toastTimer=null;
+function toast(message){
+  const el=$('toast');
+  if(!el)return;
+  el.textContent=message;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1500);
+}
+function tapFeedback(strong=false){
+  if(navigator.vibrate){
+    try{navigator.vibrate(strong?14:8)}catch(_){}
+  }
+}
+
 const root=document.documentElement;
 let layoutViewportHeight=window.innerHeight;
 
@@ -1045,6 +1099,7 @@ function applyPrivacy(){
 /* navigation */
 const titles={bills:'账单',assets:'资产',data:'数据',fire:'FIRE'};
 document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>{
+  tapFeedback();
   const p=btn.dataset.page;document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-'+p).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===btn));$('headerTitle').textContent=titles[p];renderAll()
 }));
@@ -1110,10 +1165,11 @@ $('txForm').addEventListener('submit',e=>{
   e.preventDefault();const amount=nonneg($('txAmount').value);if(!amount)return;
   const row={id:editingTxId||Date.now(),type:$('txType').value,amount,category:$('txCategory').value,date:$('txDate').value,note:$('txNote').value.trim()};
   if(editingTxId){const i=state.bills.findIndex(x=>x.id===editingTxId);if(i>=0)state.bills[i]=row}else state.bills.push(row);
-  editingTxId=null;save();closeModal('txModal');renderAll();
+  const wasEdit=!!editingTxId;
+  editingTxId=null;save();closeModal('txModal');renderAll();tapFeedback(true);toast(wasEdit?'账单已更新':'账单已保存');
 });
 $('deleteTxBtn').addEventListener('click',()=>{
-  if(editingTxId){state.bills=state.bills.filter(x=>x.id!==editingTxId);editingTxId=null;save();closeModal('txModal');renderAll()}
+  if(editingTxId){state.bills=state.bills.filter(x=>x.id!==editingTxId);editingTxId=null;save();closeModal('txModal');renderAll();tapFeedback(true);toast('账单已删除')}
 });
 function openAsset(a=null){
   editingAssetId=a?a.id:null;
@@ -1129,10 +1185,11 @@ $('assetForm').addEventListener('submit',e=>{
   e.preventDefault();const balance=nonneg($('assetBalance').value);if(!$('assetName').value.trim())return;
   const row={id:editingAssetId||Date.now(),name:$('assetName').value.trim(),type:$('assetType').value,balance,includeFire:$('assetIncludeFire').checked};
   if(editingAssetId){const i=state.assets.findIndex(x=>x.id===editingAssetId);if(i>=0)state.assets[i]=row}else state.assets.push(row);
-  editingAssetId=null;recordAssetSnapshot();save();closeModal('assetModal');renderAll();
+  const wasEdit=!!editingAssetId;
+  editingAssetId=null;recordAssetSnapshot();save();closeModal('assetModal');renderAll();tapFeedback(true);toast(wasEdit?'资产已更新':'资产已添加');
 });
 $('deleteAssetBtn').addEventListener('click',()=>{
-  if(editingAssetId){state.assets=state.assets.filter(x=>x.id!==editingAssetId);editingAssetId=null;recordAssetSnapshot();save();closeModal('assetModal');renderAll()}
+  if(editingAssetId){state.assets=state.assets.filter(x=>x.id!==editingAssetId);editingAssetId=null;recordAssetSnapshot();save();closeModal('assetModal');renderAll();tapFeedback(true);toast('资产已删除')}
 });
 $('assetType').addEventListener('change',()=>{
   if($('assetType').value==='other')$('assetIncludeFire').checked=false;
@@ -1173,16 +1230,17 @@ $('performanceForm').addEventListener('submit',e=>{
     const same=state.performanceRecords.findIndex(x=>x.year===year);
     if(same>=0)state.performanceRecords[same]=row;else state.performanceRecords.push(row);
   }
-  editingPerformanceId=null;save();closeModal('performanceModal');renderAll();
+  const wasEdit=!!editingPerformanceId;
+  editingPerformanceId=null;save();closeModal('performanceModal');renderAll();tapFeedback(true);toast(wasEdit?'收益率已更新':'收益率已记录');
 });
 $('deletePerformanceBtn').addEventListener('click',()=>{
   if(editingPerformanceId){
     state.performanceRecords=state.performanceRecords.filter(x=>x.id!==editingPerformanceId);
-    editingPerformanceId=null;save();closeModal('performanceModal');renderAll();
+    editingPerformanceId=null;save();closeModal('performanceModal');renderAll();tapFeedback(true);toast('收益率记录已删除');
   }
 });
 
-$('quickAddBtn').addEventListener('click',()=>openModal('quickModal'));$('quickExpense').addEventListener('click',()=>{closeModal('quickModal');openTx('expense')});$('quickIncome').addEventListener('click',()=>{closeModal('quickModal');openTx('income')});$('quickTransfer').addEventListener('click',()=>{closeModal('quickModal');openTx('transfer')});$('quickAsset').addEventListener('click',()=>{closeModal('quickModal');openAsset()});
+$('quickAddBtn').addEventListener('click',()=>{tapFeedback();openModal('quickModal')});$('quickExpense').addEventListener('click',()=>{closeModal('quickModal');openTx('expense')});$('quickIncome').addEventListener('click',()=>{closeModal('quickModal');openTx('income')});$('quickTransfer').addEventListener('click',()=>{closeModal('quickModal');openTx('transfer')});$('quickAsset').addEventListener('click',()=>{closeModal('quickModal');openAsset()});
 
 /* monthly investment source */
 function refreshMonthlyInvestModal(){
@@ -1222,11 +1280,11 @@ $('saveMonthlyInvestBtn').addEventListener('click',()=>{
   const manual=$('monthlyInvestMode').value==='manual';
   state.fire.useManualMonthlyInvest=manual;
   if(manual)state.fire.manualMonthlyInvest=nonneg($('manualMonthlyInvestInput').value);
-  save();closeModal('monthlyInvestModal');renderAll();
+  save();closeModal('monthlyInvestModal');renderAll();tapFeedback(true);toast('月均实际投资已保存');
 });
 
 /* FIRE planning interactions */
-$('customGoalToggle').addEventListener('change',()=>{
+$('customGoalToggle').addEventListener('change',()=>{tapFeedback();
   state.fire.useCustomTarget=$('customGoalToggle').checked;
   if(state.fire.useCustomTarget && (!Number.isFinite(Number(state.fire.customTarget)) || Number(state.fire.customTarget)<=0)){
     const f=recentPlanningFacts(12);state.fire.customTarget=f.systemTarget||2000000;
