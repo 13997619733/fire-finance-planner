@@ -2,13 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>FIRE 财务规划工具</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3378e6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
   --blue:#3378e6;--blue2:#eaf2ff;--green:#39966a;--red:#d45c5c;--orange:#d89240;
@@ -20,7 +15,7 @@ html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,
 body{display:flex;justify-content:center}
 button,input,select{font:inherit} button{cursor:pointer}
 .app{
-  width:min(100%,430px);min-height:100vh;position:relative;overflow:hidden;padding:18px 20px 122px;
+  width:min(100%,430px);min-height:var(--app-height,100dvh);position:relative;overflow:hidden;padding:calc(18px + env(safe-area-inset-top)) 20px calc(118px + env(safe-area-inset-bottom));
   background:
     radial-gradient(circle at 88% 1%,rgba(196,241,232,.5),transparent 24%),
     radial-gradient(circle at 13% 0%,rgba(205,221,255,.66),transparent 30%),
@@ -158,17 +153,63 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
 .scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenario{background:#f7f9fc;border-radius:13px;padding:10px 5px;text-align:center}.scenario b{font-size:16px}.scenario small{display:block;color:#8d949e;margin-top:3px;font-size:10px}
 
 /* modal */
-.modal-backdrop{position:fixed;inset:0;background:rgba(18,23,31,.38);display:none;align-items:flex-end;justify-content:center;padding:16px;z-index:50}
-.modal-backdrop.show{display:flex}.modal{width:min(100%,430px);max-height:84vh;overflow:auto;background:white;border-radius:25px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.2)}
-.modal-head{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:850;margin-bottom:14px}.close{border:0;width:34px;height:34px;border-radius:50%;background:#f0f3f7;font-size:18px}
-.modal-form{display:flex;flex-direction:column;gap:10px}.field label{display:block;font-size:11px;color:#7d848e;margin-bottom:5px}.field input,.field select{width:100%;border:1px solid #dfe5ec;border-radius:12px;padding:11px;font-size:16px;outline:0;background:white}
-.check-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#606872}.modal-actions{display:flex;gap:8px;margin-top:14px}.modal-actions button{flex:1}
+.modal-backdrop{
+  position:fixed;left:0;right:0;top:var(--vv-top,0px);height:var(--vv-height,100dvh);
+  background:rgba(18,23,31,.38);display:none;align-items:flex-end;justify-content:center;
+  padding:16px max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  z-index:50;overscroll-behavior:contain
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  width:min(100%,430px);
+  max-height:calc(var(--vv-height,100dvh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  background:white;border-radius:25px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.2)
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:850;margin-bottom:14px;position:sticky;top:-20px;background:white;z-index:2;padding-top:2px}
+.close{border:0;width:34px;height:34px;border-radius:50%;background:#f0f3f7;font-size:18px;flex:0 0 auto}
+.modal-form{display:flex;flex-direction:column;gap:10px}
+.field label{display:block;font-size:11px;color:#7d848e;margin-bottom:5px}
+.field input,.field select{
+  width:100%;border:1px solid #dfe5ec;border-radius:12px;padding:12px 11px;
+  font-size:16px;line-height:1.25;outline:0;background:white;scroll-margin-block:96px
+}
+.check-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#606872}
+.modal-actions{display:flex;gap:8px;margin-top:14px;padding-bottom:max(2px,env(safe-area-inset-bottom))}
+.modal-actions button{flex:1}
+body.keyboard-open .bottom-nav{display:none}
+body.keyboard-open .app{padding-bottom:24px}
+body.keyboard-open .modal-backdrop{align-items:flex-start;padding-top:max(10px,env(safe-area-inset-top));padding-bottom:8px}
+body.keyboard-open .modal{max-height:calc(var(--vv-height,100dvh) - 18px - env(safe-area-inset-top))}
+input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
 
 /* bottom nav */
-.bottom-nav{position:absolute;left:20px;right:20px;bottom:16px;height:70px;background:rgba(255,255,255,.92);border-radius:31px;box-shadow:0 8px 28px rgba(29,45,74,.11);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding:0 7px;backdrop-filter:blur(22px);z-index:4}
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(12px + env(safe-area-inset-bottom));
+  width:min(calc(100% - 40px),390px);
+  height:70px;
+  background:rgba(255,255,255,.94);
+  border-radius:31px;
+  box-shadow:0 8px 28px rgba(29,45,74,.15);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  align-items:center;
+  padding:0 7px;
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  z-index:40
+}
 .nav-item{height:56px;border:0;background:transparent;border-radius:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:#1b1e23}.nav-item.active{background:#e8f2ff;color:var(--blue);font-weight:800}.nav-icon{font-size:22px;line-height:1}.nav-plus{width:50px;height:50px;border:0;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:32px;box-shadow:0 4px 16px rgba(20,30,50,.09);margin:auto}
 @media(max-width:360px){
-  .app{padding-left:14px;padding-right:14px}.card{padding:18px}.cash-top{grid-template-columns:78px minmax(0,1fr)}.cash-input{width:122px;font-size:20px}.hero-time .num{font-size:50px}.bottom-nav{left:11px;right:11px}
+  .app{padding-left:14px;padding-right:14px}
+  .card{padding:18px}
+  .cash-top{grid-template-columns:78px minmax(0,1fr)}
+  .cash-input{width:122px;font-size:20px}
+  .hero-time .num{font-size:50px}
+  .bottom-nav{width:calc(100% - 22px)}
 }
 </style>
 </head>
@@ -469,7 +510,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
       </div>
       <div class="field" id="manualInvestField">
         <label>我每月实际投资</label>
-        <input id="manualMonthlyInvestInput" type="number" min="0" step=".01" placeholder="例如 5000">
+        <input id="manualMonthlyInvestInput" type="number" inputmode="decimal" enterkeyhint="done" min="0" step=".01" placeholder="例如 5000">
       </div>
       <div class="mini" id="monthlyInvestModeHint">
         手动设置适合“结余不一定全部投资”的情况。
@@ -487,8 +528,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
   <div class="modal">
     <div class="modal-head"><span id="performanceModalTitle">记录年度收益率</span><button class="close" data-close="performanceModal">×</button></div>
     <form class="modal-form" id="performanceForm">
-      <div class="field"><label>年份</label><input id="performanceYear" type="number" min="2000" max="2100" step="1" required></div>
-      <div class="field"><label>投资收益率</label><input id="performanceRate" type="number" min="-99.99" max="1000" step=".01" required placeholder="例如 6.50"></div>
+      <div class="field"><label>年份</label><input id="performanceYear" type="number" inputmode="numeric" enterkeyhint="next" min="2000" max="2100" step="1" required></div>
+      <div class="field"><label>投资收益率</label><input id="performanceRate" type="number" inputmode="decimal" enterkeyhint="done" min="-99.99" max="1000" step=".01" required placeholder="例如 6.50"></div>
       <div class="mini">例如今年投资收益率为 6.5%，直接填写 6.50；亏损 8% 则填写 -8.00。</div>
       <div class="modal-actions">
         <button type="button" class="danger-btn" id="deletePerformanceBtn" style="display:none">删除</button>
@@ -514,6 +555,53 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
 <script>
 (() => {
 const $=id=>document.getElementById(id);
+const root=document.documentElement;
+let layoutViewportHeight=window.innerHeight;
+
+function updateVisibleViewport(){
+  const vv=window.visualViewport;
+  const h=vv?vv.height:window.innerHeight;
+  const top=vv?vv.offsetTop:0;
+
+  root.style.setProperty('--vv-height',`${Math.max(240,h)}px`);
+  root.style.setProperty('--vv-top',`${Math.max(0,top)}px`);
+  root.style.setProperty('--app-height',`${Math.max(240,h)}px`);
+
+  const baseline=Math.max(layoutViewportHeight,window.innerHeight);
+  const keyboardLikelyOpen=h < baseline-140;
+  document.body.classList.toggle('keyboard-open',keyboardLikelyOpen);
+}
+
+function keepFocusedControlVisible(el){
+  if(!el || !/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))return;
+  setTimeout(()=>{
+    try{el.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'})}catch(_){el.scrollIntoView()}
+  },180);
+  setTimeout(()=>{
+    try{el.scrollIntoView({block:'center',inline:'nearest'})}catch(_){}
+  },420);
+}
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateVisibleViewport);
+  window.visualViewport.addEventListener('scroll',updateVisibleViewport);
+}
+window.addEventListener('resize',()=>{
+  if(!document.body.classList.contains('keyboard-open'))layoutViewportHeight=Math.max(layoutViewportHeight,window.innerHeight);
+  updateVisibleViewport();
+});
+document.addEventListener('focusin',e=>{
+  if(e.target.matches('input,select,textarea')){
+    updateVisibleViewport();
+    keepFocusedControlVisible(e.target);
+  }
+});
+document.addEventListener('focusout',()=>{
+  setTimeout(updateVisibleViewport,120);
+});
+updateVisibleViewport();
+
+
 const STORE='firePlannerV10';
 const today=new Date();
 const pad=n=>String(n).padStart(2,'0');
@@ -895,7 +983,16 @@ $('nextMonth').addEventListener('click',()=>{selectedMonth=new Date(selectedMont
 
 /* modals */
 let editingTxId=null,editingAssetId=null,editingPerformanceId=null;
-function openModal(id){$(id).classList.add('show')}function closeModal(id){$(id).classList.remove('show')}
+function openModal(id){
+  $(id).classList.add('show');
+  requestAnimationFrame(updateVisibleViewport);
+}
+function closeModal(id){
+  const active=document.activeElement;
+  if(active&&$(id).contains(active)&&typeof active.blur==='function')active.blur();
+  $(id).classList.remove('show');
+  setTimeout(updateVisibleViewport,80);
+}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
 document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 const expenseCats=['住房','餐饮','交通','水电通信','娱乐','购物','医疗','教育','其他'],incomeCats=['工资','奖金','副业','投资收益','其他'],transferCats=['投入投资账户','账户间转账'];
@@ -1032,13 +1129,17 @@ $('lessSpendRange').addEventListener('input',()=>{
 
 recordAssetSnapshot();
 save();
+
+document.querySelectorAll('input[type="number"]').forEach(el=>{
+  if(!el.hasAttribute('inputmode')){
+    const step=(el.getAttribute('step')||'').trim();
+    el.setAttribute('inputmode',step==='1'?'numeric':'decimal');
+  }
+  if(!el.hasAttribute('enterkeyhint'))el.setAttribute('enterkeyhint','done');
+});
+
 renderAll();
 })();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
 </script>
 </body>
 </html>
