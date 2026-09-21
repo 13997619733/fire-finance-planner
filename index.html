@@ -95,7 +95,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 /* 数据驱动 FIRE */
 .fire-facts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .fire-fact{background:#f7f9fc;border-radius:15px;padding:12px}
-.fire-fact .label{font-size:10px;color:#8d949e;line-height:1.4}
+.fire-fact .label{font-size:10px;color:#8d949e;line-height:1.4}.fact-top{display:flex;justify-content:space-between;align-items:center;gap:6px}.fact-edit{border:0;background:transparent;color:var(--blue);font-size:10px;font-weight:760;padding:0}
 .fire-fact .value{font-size:18px;font-weight:850;margin-top:4px}
 .fire-fact .source{font-size:9px;color:#a0a6ae;margin-top:3px}
 .goal-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
@@ -304,7 +304,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
         <div class="source" id="factExpenseSource">--</div>
       </div>
       <div class="fire-fact">
-        <div class="label">月均实际投资</div>
+        <div class="fact-top"><div class="label">月均实际投资</div><button class="fact-edit" id="editMonthlyInvestBtn">修改</button></div>
         <div class="value amount" id="factInvest">--</div>
         <div class="source" id="factInvestSource">--</div>
       </div>
@@ -404,6 +404,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
       <summary>计算说明</summary>
       <div class="model-copy" id="fireModelCopy">
         系统目标默认按年度生活支出 ÷ 4% 估算；未投资现金默认按 0% 实际收益率计算。
+        月均实际投资可以手动设置，也可以按“投入投资账户”的转账记录自动统计，不再默认把全部月结余视为投资。
         投资收益率优先使用你在“数据”页记录的多年年化收益率；没有历史记录时暂用 4% 作为模型缺省值。
       </div>
     </details>
@@ -446,6 +447,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:25px;heigh
       <div class="mini" id="assetFireHint">建议只有现金/存款、投资账户勾选；房产、车辆等通常不要直接计入 FIRE 可用资金。</div>
       <div class="modal-actions"><button type="button" class="danger-btn" id="deleteAssetBtn" style="display:none">删除</button><button type="button" class="secondary-btn" data-close="assetModal">取消</button><button class="primary-btn" type="submit">保存</button></div>
     </form>
+  </div>
+</div>
+
+<!-- monthly investment modal -->
+<div class="modal-backdrop" id="monthlyInvestModal">
+  <div class="modal">
+    <div class="modal-head"><span>月均实际投资</span><button class="close" data-close="monthlyInvestModal">×</button></div>
+    <div class="modal-form">
+      <div class="field">
+        <label>数据来源</label>
+        <select id="monthlyInvestMode">
+          <option value="manual">手动设置</option>
+          <option value="auto">按投资转账自动统计</option>
+        </select>
+      </div>
+      <div class="field" id="manualInvestField">
+        <label>我每月实际投资</label>
+        <input id="manualMonthlyInvestInput" type="number" min="0" step=".01" placeholder="例如 5000">
+      </div>
+      <div class="mini" id="monthlyInvestModeHint">
+        手动设置适合“结余不一定全部投资”的情况。
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" data-close="monthlyInvestModal">取消</button>
+        <button type="button" class="primary-btn" id="saveMonthlyInvestBtn">保存</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -527,6 +555,10 @@ if(typeof state.fire.useCustomTarget!=='boolean')state.fire.useCustomTarget=fals
 if(!Number.isFinite(Number(state.fire.customTarget)))state.fire.customTarget=Number(state.fire.target)||2000000;
 if(!Number.isFinite(Number(state.fire.whatIfExtraInvest)))state.fire.whatIfExtraInvest=1000;
 if(!Number.isFinite(Number(state.fire.whatIfLessSpend)))state.fire.whatIfLessSpend=1000;
+if(typeof state.fire.useManualMonthlyInvest!=='boolean')state.fire.useManualMonthlyInvest=true;
+if(!Number.isFinite(Number(state.fire.manualMonthlyInvest))){
+  state.fire.manualMonthlyInvest=Number.isFinite(Number(state.fire.monthlyInvest))?Number(state.fire.monthlyInvest):0;
+}
 let selectedMonth=new Date(today.getFullYear(),today.getMonth(),1);
 let hidden=false;
 function save(){localStorage.setItem(STORE,JSON.stringify(state))}
@@ -579,8 +611,12 @@ function recentPlanningFacts(n=12){
     if(t>0)hasInvestmentTransfers=true;
     transferTotal+=t;
   });
-  const monthlyInvest=hasInvestmentTransfers&&count?transferTotal/count:Math.max(0,surplus);
-  const investSource=hasInvestmentTransfers?'按“投入投资账户”的转账记录统计':'暂无投资转账，暂按月均结余估算';
+  const autoMonthlyInvest=hasInvestmentTransfers&&count?transferTotal/count:0;
+  const manualMonthlyInvest=Math.max(0,Number(state.fire.manualMonthlyInvest)||0);
+  const monthlyInvest=state.fire.useManualMonthlyInvest?manualMonthlyInvest:autoMonthlyInvest;
+  const investSource=state.fire.useManualMonthlyInvest
+    ?'手动设置'
+    :(hasInvestmentTransfers?'按“投入投资账户”的转账记录统计':'暂无投资转账记录，当前按 ¥0 统计');
 
   const a=assetStats();
   const ann=annualizedReturn();
@@ -935,6 +971,41 @@ $('deletePerformanceBtn').addEventListener('click',()=>{
 });
 
 $('quickAddBtn').addEventListener('click',()=>openModal('quickModal'));$('quickExpense').addEventListener('click',()=>{closeModal('quickModal');openTx('expense')});$('quickIncome').addEventListener('click',()=>{closeModal('quickModal');openTx('income')});$('quickTransfer').addEventListener('click',()=>{closeModal('quickModal');openTx('transfer')});$('quickAsset').addEventListener('click',()=>{closeModal('quickModal');openAsset()});
+
+/* monthly investment source */
+function refreshMonthlyInvestModal(){
+  const manual=state.fire.useManualMonthlyInvest;
+  $('monthlyInvestMode').value=manual?'manual':'auto';
+  $('manualInvestField').style.display=manual?'block':'none';
+  $('manualMonthlyInvestInput').value=Number(state.fire.manualMonthlyInvest||0).toFixed(2);
+
+  const f=recentPlanningFacts(12);
+  if(manual){
+    $('monthlyInvestModeHint').textContent='手动设置适合“月结余不一定全部用于投资”的情况。';
+  }else{
+    const transferCount=state.bills.filter(x=>x.type==='transfer'&&x.category==='投入投资账户').length;
+    $('monthlyInvestModeHint').textContent=transferCount
+      ?'系统会根据“投入投资账户”的转账记录计算月均实际投资。'
+      :'还没有“投入投资账户”的转账记录，自动统计目前会按 ¥0 计算。';
+  }
+}
+$('editMonthlyInvestBtn').addEventListener('click',()=>{
+  refreshMonthlyInvestModal();
+  openModal('monthlyInvestModal');
+});
+$('monthlyInvestMode').addEventListener('change',()=>{
+  const manual=$('monthlyInvestMode').value==='manual';
+  $('manualInvestField').style.display=manual?'block':'none';
+  $('monthlyInvestModeHint').textContent=manual
+    ?'手动设置适合“月结余不一定全部用于投资”的情况。'
+    :'只有“投入投资账户”的转账会被统计为实际投资，普通结余不会自动当成投资。';
+});
+$('saveMonthlyInvestBtn').addEventListener('click',()=>{
+  const manual=$('monthlyInvestMode').value==='manual';
+  state.fire.useManualMonthlyInvest=manual;
+  if(manual)state.fire.manualMonthlyInvest=nonneg($('manualMonthlyInvestInput').value);
+  save();closeModal('monthlyInvestModal');renderAll();
+});
 
 /* FIRE planning interactions */
 $('customGoalToggle').addEventListener('change',()=>{
