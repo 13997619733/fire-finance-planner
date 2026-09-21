@@ -183,6 +183,40 @@ body.keyboard-open .modal-backdrop{align-items:flex-start;padding-top:max(10px,e
 body.keyboard-open .modal{max-height:calc(var(--vv-height,100dvh) - 18px - env(safe-area-inset-top))}
 input,select,textarea{scroll-margin-top:90px;scroll-margin-bottom:120px}
 
+/* Android IME fallback:
+   Some Android browsers/WebViews do not correctly resize visualViewport.
+   Whenever a form control inside a modal is focused, force the sheet to the
+   top and add scroll room so the focused control can always be lifted above
+   the keyboard. */
+.modal-backdrop.input-active{
+  align-items:flex-start !important;
+  padding-top:max(8px,env(safe-area-inset-top)) !important;
+  padding-bottom:8px !important;
+}
+.modal-backdrop.input-active .modal{
+  max-height:calc(100dvh - 16px - env(safe-area-inset-top)) !important;
+  border-radius:20px;
+}
+.modal-backdrop.input-active .modal::after{
+  content:"";
+  display:block;
+  height:48vh;
+  min-height:260px;
+  pointer-events:none;
+}
+.modal-backdrop.input-active .modal-head{
+  top:-20px;
+}
+.modal-backdrop.input-active .field:focus-within label{
+  color:var(--blue);
+  font-weight:750;
+}
+.modal-backdrop.input-active .field:focus-within input,
+.modal-backdrop.input-active .field:focus-within select{
+  border-color:#8bb4f5;
+  box-shadow:0 0 0 3px rgba(51,120,230,.09);
+}
+
 /* bottom nav */
 .bottom-nav{
   position:fixed;
@@ -574,12 +608,40 @@ function updateVisibleViewport(){
 
 function keepFocusedControlVisible(el){
   if(!el || !/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))return;
-  setTimeout(()=>{
-    try{el.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'})}catch(_){el.scrollIntoView()}
-  },180);
-  setTimeout(()=>{
-    try{el.scrollIntoView({block:'center',inline:'nearest'})}catch(_){}
-  },420);
+
+  const backdrop=el.closest('.modal-backdrop');
+  const modal=el.closest('.modal');
+
+  if(backdrop)backdrop.classList.add('input-active');
+
+  const lift=()=>{
+    if(!modal || !document.body.contains(el))return;
+
+    // Force enough scroll room even when Android reports the old full viewport height.
+    const modalRect=modal.getBoundingClientRect();
+    const elRect=el.getBoundingClientRect();
+
+    // Aim to keep the active field roughly 95–145 px below the visible top.
+    const desiredTop=120;
+    const delta=elRect.top-desiredTop;
+
+    if(Math.abs(delta)>8){
+      modal.scrollTop+=delta;
+    }
+
+    // A second pass using offsetTop handles Samsung/MIUI browsers where
+    // getBoundingClientRect changes only after the keyboard animation finishes.
+    const relativeTop=el.offsetTop-modal.scrollTop;
+    if(relativeTop>165 || relativeTop<80){
+      modal.scrollTop=Math.max(0,el.offsetTop-115);
+    }
+  };
+
+  requestAnimationFrame(lift);
+  setTimeout(lift,120);
+  setTimeout(lift,300);
+  setTimeout(lift,550);
+  setTimeout(lift,850);
 }
 
 if(window.visualViewport){
@@ -596,8 +658,17 @@ document.addEventListener('focusin',e=>{
     keepFocusedControlVisible(e.target);
   }
 });
-document.addEventListener('focusout',()=>{
-  setTimeout(updateVisibleViewport,120);
+document.addEventListener('focusout',e=>{
+  const backdrop=e.target.closest&&e.target.closest('.modal-backdrop');
+  setTimeout(()=>{
+    updateVisibleViewport();
+    const active=document.activeElement;
+    if(backdrop && (!active || !backdrop.contains(active) || !active.matches('input,select,textarea'))){
+      backdrop.classList.remove('input-active');
+      const modal=backdrop.querySelector('.modal');
+      if(modal)modal.scrollTop=0;
+    }
+  },160);
 });
 updateVisibleViewport();
 
@@ -991,6 +1062,9 @@ function closeModal(id){
   const active=document.activeElement;
   if(active&&$(id).contains(active)&&typeof active.blur==='function')active.blur();
   $(id).classList.remove('show');
+  $(id).classList.remove('input-active');
+  const modal=$(id).querySelector('.modal');
+  if(modal)modal.scrollTop=0;
   setTimeout(updateVisibleViewport,80);
 }
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
@@ -1008,6 +1082,29 @@ function openTx(type,tx=null){
   $('deleteTxBtn').style.display=tx?'block':'none';
   openModal('txModal');
 }
+
+function focusNextModalControl(current){
+  const modal=current.closest('.modal');
+  if(!modal)return;
+  const controls=[...modal.querySelectorAll('input:not([disabled]),select:not([disabled]),textarea:not([disabled])')]
+    .filter(x=>x.offsetParent!==null);
+  const i=controls.indexOf(current);
+  if(i>=0 && i<controls.length-1)controls[i+1].focus();
+  else{
+    const form=current.closest('form');
+    if(form)form.requestSubmit();
+    else current.blur();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const el=e.target;
+  if(!el.matches('.modal input'))return;
+  if(el.id==='performanceYear'||el.id==='performanceRate'||el.id==='manualMonthlyInvestInput')return;
+  e.preventDefault();
+  focusNextModalControl(el);
+});
+
 $('txType').addEventListener('change',()=>setTxCats($('txType').value));$('addExpenseBtn').addEventListener('click',()=>openTx('expense'));$('addIncomeBtn').addEventListener('click',()=>openTx('income'));
 $('txForm').addEventListener('submit',e=>{
   e.preventDefault();const amount=nonneg($('txAmount').value);if(!amount)return;
@@ -1050,6 +1147,19 @@ function openPerformance(r=null){
   openModal('performanceModal');
 }
 $('addPerformanceBtn').addEventListener('click',()=>openPerformance());
+$('performanceYear').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    $('performanceRate').focus();
+  }
+});
+$('performanceRate').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    $('performanceForm').requestSubmit();
+  }
+});
+
 $('performanceForm').addEventListener('submit',e=>{
   e.preventDefault();
   const year=Math.round(Number($('performanceYear').value));
@@ -1101,6 +1211,12 @@ $('monthlyInvestMode').addEventListener('change',()=>{
   $('monthlyInvestModeHint').textContent=manual
     ?'手动设置适合“月结余不一定全部用于投资”的情况。'
     :'只有“投入投资账户”的转账会被统计为实际投资，普通结余不会自动当成投资。';
+});
+$('manualMonthlyInvestInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    $('saveMonthlyInvestBtn').click();
+  }
 });
 $('saveMonthlyInvestBtn').addEventListener('click',()=>{
   const manual=$('monthlyInvestMode').value==='manual';
