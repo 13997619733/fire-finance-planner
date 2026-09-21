@@ -12,11 +12,25 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-button,.tx-item,.asset-item,.perf-item,.nav-item,.nav-plus,.text-btn,.round-btn{
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation
+button,.tx-item,.asset-item,.perf-item,.nav-item,.nav-plus,.text-btn,.round-btn,.close,label{
+  -webkit-tap-highlight-color:rgba(0,0,0,0)!important;
+  touch-action:manipulation
 }
 button{user-select:none;-webkit-user-select:none}
-:focus-visible{outline:3px solid rgba(51,120,230,.22);outline-offset:2px}
+button,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button{
+  -webkit-appearance:none;appearance:none;
+  outline:none !important;
+  -webkit-touch-callout:none;
+}
+button:focus,button:focus-visible{outline:none !important}
+
+/* 键盘/鼠标环境仍保留无矩形框的可访问焦点提示；
+   手机触摸环境不显示点击后的蓝色/青色方框。 */
+@media (hover:hover) and (pointer:fine){
+  button:focus-visible{box-shadow:0 0 0 3px rgba(51,120,230,.16)}
+}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
 html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#dfe5ee;color:var(--text)}
 body{display:flex;justify-content:center}
 button,input,select{font:inherit} button{cursor:pointer}
@@ -38,7 +52,13 @@ button,input,select{font:inherit} button{cursor:pointer}
 .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card-head>div{min-width:0}
 .card-title{font-size:18px;font-weight:830}
 .card-note{font-size:11px;color:#9aa1aa;margin-top:4px;line-height:1.45}
-.text-btn{border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:780;padding:7px 8px;min-height:36px;white-space:nowrap;flex:0 0 auto;border-radius:10px;transition:transform .12s ease,background .12s ease}
+.text-btn{
+  border:0;background:transparent;color:var(--blue);font-size:13px;font-weight:780;
+  padding:7px 8px;min-height:36px;white-space:nowrap;flex:0 0 auto;border-radius:10px;
+  outline:none!important;box-shadow:none;
+  transition:transform .12s ease,background .12s ease
+}
+.text-btn:focus,.text-btn:focus-visible{outline:none!important;box-shadow:none!important}
 .text-btn:active{transform:scale(.94);background:#edf4ff}
 .section-title{font-size:13px;font-weight:800;color:#646b75;margin:18px 0 9px}
 .empty{padding:22px;text-align:center;color:#9aa1aa;font-size:13px}
@@ -68,6 +88,8 @@ button,input,select{font:inherit} button{cursor:pointer}
 .primary-btn{background:var(--blue);color:white;box-shadow:0 5px 14px rgba(51,120,230,.18)}
 .secondary-btn{background:#eef3f9;color:#59616c}
 .danger-btn{background:#fff0f0;color:#c64f4f}
+.primary-btn:focus,.secondary-btn:focus,.danger-btn:focus,
+.primary-btn:focus-visible,.secondary-btn:focus-visible,.danger-btn:focus-visible{outline:none!important}
 .primary-btn:active,.secondary-btn:active,.danger-btn:active{transform:scale(.97);filter:brightness(.97)}
 
 /* assets */
@@ -183,8 +205,14 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12);box-shadow:
   background:white;border-radius:25px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.2)
 }
 .modal-head{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:850;margin-bottom:14px;position:sticky;top:-20px;background:white;z-index:2;padding-top:2px}
-.close{border:0;width:38px;height:38px;border-radius:50%;background:#f0f3f7;font-size:18px;flex:0 0 auto;transition:transform .12s ease,background .12s ease}
-.close:active{transform:scale(.9);background:#e4e9ef}
+.close{
+  border:0;width:38px;height:38px;border-radius:999px;background:#f0f3f7;color:#111;
+  display:grid;place-items:center;font-size:18px;line-height:1;flex:0 0 auto;
+  outline:none!important;box-shadow:none;
+  transition:transform .12s ease,background .12s ease
+}
+.close:focus,.close:focus-visible{outline:none!important;box-shadow:none!important}
+.close:active{transform:scale(.88);background:#e4e9ef}
 .modal-form{display:flex;flex-direction:column;gap:10px}
 .field label{display:block;font-size:11px;color:#7d848e;margin-bottom:5px}
 .field input,.field select{
@@ -266,11 +294,13 @@ body.keyboard-open .toast{bottom:18px}
   z-index:40
 }
 .nav-item{height:56px;border:0;background:transparent;border-radius:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:#59616c;transition:transform .14s ease,background .16s ease,color .16s ease}
+.nav-item:focus,.nav-item:focus-visible{outline:none!important;box-shadow:none!important}
 .nav-item:active{transform:scale(.92)}
 .nav-item.active{background:#e8f2ff;color:var(--blue);font-weight:820}
 .nav-icon{font-size:22px;line-height:1;transition:transform .16s ease}
 .nav-item.active .nav-icon{transform:translateY(-1px) scale(1.08)}
 .nav-plus{width:50px;height:50px;border:0;border-radius:50%;background:linear-gradient(180deg,#fff,#f6f9fd);display:grid;place-items:center;font-size:32px;color:var(--blue);box-shadow:0 5px 18px rgba(20,30,50,.13);margin:auto;transition:transform .14s ease,box-shadow .14s ease}
+.nav-plus:focus,.nav-plus:focus-visible{outline:none!important}
 .nav-plus:active{transform:scale(.9) rotate(8deg);box-shadow:0 3px 10px rgba(20,30,50,.10)}
 @media(max-width:360px){
   .app{padding-left:14px;padding-right:14px}
@@ -642,6 +672,19 @@ function tapFeedback(strong=false){
     try{navigator.vibrate(strong?14:8)}catch(_){}
   }
 }
+
+/* Android WebView/Chrome sometimes keeps a visual focus rectangle after tapping.
+   Blur buttons after pointer release; form inputs keep their normal focus. */
+document.addEventListener('pointerup',e=>{
+  const btn=e.target.closest&&e.target.closest('button');
+  if(!btn)return;
+  setTimeout(()=>{
+    if(document.activeElement===btn){
+      try{btn.blur()}catch(_){}
+    }
+  },80);
+});
+
 
 const root=document.documentElement;
 let layoutViewportHeight=window.innerHeight;
