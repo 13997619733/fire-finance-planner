@@ -1,0 +1,21 @@
+{
+  "name": "FIRE 财务规划工具",
+  "short_name": "FIRE",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#dfe5ee",
+  "theme_color": "#3378e6",
+  "description": "个人 FIRE 财务规划与追踪工具",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

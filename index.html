@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FIRE 财务规划工具</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3378e6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
   --blue:#3378e6;--blue2:#eaf2ff;--green:#39966a;--red:#d45c5c;--orange:#d89240;
@@ -1029,6 +1034,11 @@ recordAssetSnapshot();
 save();
 renderAll();
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
